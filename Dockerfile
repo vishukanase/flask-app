@@ -1,6 +1,13 @@
-FROM python:3-alpine3.15
+# Dockerfile
+
+FROM python:3.10-slim
+
 WORKDIR /app
-COPY . /app
-RUN pip install -r requirements.txt 
+
+COPY . .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
 EXPOSE 5000
-CMD ["python" ,"index.py"]
+
+CMD ["python", "app.py"]
