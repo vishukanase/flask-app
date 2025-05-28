@@ -2,9 +2,8 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'flask-app-image'
-        TAG = 'latest'
-        CONTAINER_NAME = 'flask-app-container'
+        VENV_DIR = 'venv'
+        FLASK_APP = 'app.py'
     }
 
     stages {
@@ -14,39 +13,33 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Set up Python Environment') {
             steps {
-                script {
-                    sh "docker build -t $IMAGE_NAME:$TAG ."
-                }
+                sh 'python3 -m venv $VENV_DIR'
+                sh './$VENV_DIR/bin/pip install --upgrade pip'
+                sh './$VENV_DIR/bin/pip install -r requirements.txt'
             }
         }
 
-        stage('Run Docker Container') {
+        stage('Run Tests') {
             steps {
-                script {
-                    // Stop and remove old container if it exists
-                    sh "docker rm -f $CONTAINER_NAME || true"
-
-                    // Run new container
-                    sh "docker run -d --name $CONTAINER_NAME -p 5000:5000 $IMAGE_NAME:$TAG"
-                }
+                echo 'No tests yet. Add pytest if needed.'
+                // Uncomment below line if you add tests
+                // sh './$VENV_DIR/bin/python -m pytest'
             }
         }
 
-        stage('Show Container Logs') {
+        stage('Run Flask App') {
             steps {
-                script {
-                    sh "sleep 5" // Give the app time to start
-                    sh "docker logs $CONTAINER_NAME"
-                }
+                sh 'nohup ./$VENV_DIR/bin/python $FLASK_APP > flask.log 2>&1 &'
+                echo 'Flask app started in background.'
             }
         }
     }
 
     post {
         success {
-            echo 'Flask app container is running. Access it on http://<Jenkins-Server-IP>:5000'
+            echo 'Pipeline completed successfully.'
         }
         failure {
             echo 'Pipeline failed.'
