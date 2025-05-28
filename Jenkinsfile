@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git credentialsId: 'github-token', url: 'https://github.com/vishukanase/your-flask-repo.git', branch: 'main'
+                git credentialsId: 'github-token', url: 'https://github.com/vishukanase/flask-app.git', branch: 'main'
             }
         }
 
