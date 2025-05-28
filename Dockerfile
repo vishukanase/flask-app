@@ -15,7 +15,7 @@ COPY . .
 EXPOSE 5000
 
 # Set environment variable for Flask app entrypoint
-ENV FLASK_APP=app.py
+ENV FLASK_APP=index.py
 
 # Command to run the Flask app
-CMD ["python", "app.py"]
+CMD ["python", "index.py"]
