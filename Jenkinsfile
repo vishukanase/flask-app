@@ -1,45 +1,54 @@
+
 pipeline {
     agent any
 
     environment {
-        VENV_DIR = 'venv'
-        FLASK_APP = 'app.py'
+        IMAGE_NAME = 'flask-app-image'
+        TAG = 'latest'
+        CONTAINER_NAME = 'flask-app-container'
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                git credentialsId: 'github-token', url: 'https://github.com/vishukanase/flask-app.git', branch: 'main'
+ git credentialsId: 'github-token', url: 'https://github.com/vishukanase/flask-app.git', branch: 'main'    
             }
         }
 
-        stage('Set up Python Environment') {
+        stage('Build Docker Image') {
             steps {
-                sh 'python3 -m venv $VENV_DIR'
-                sh './$VENV_DIR/bin/pip install --upgrade pip'
-                sh './$VENV_DIR/bin/pip install -r requirements.txt'
+                script {
+                    sh 'docker --version' // Check Docker is accessible
+                    sh "docker build -t $IMAGE_NAME:$TAG ."
+                }
             }
         }
 
-        stage('Run Tests') {
+        stage('Run Docker Container') {
             steps {
-                echo 'No tests yet. Add pytest if needed.'
-                // Uncomment below line if you add tests
-                // sh './$VENV_DIR/bin/python -m pytest'
+                script {
+                    // Stop and remove old container if it exists
+                    sh "docker rm -f $CONTAINER_NAME || true"
+
+                    // Run new container
+                    sh "docker run -d --name $CONTAINER_NAME -p 5000:5000 $IMAGE_NAME:$TAG"
+                }
             }
         }
 
-        stage('Run Flask App') {
+        stage('Show Container Logs') {
             steps {
-                sh 'nohup ./$VENV_DIR/bin/python $FLASK_APP > flask.log 2>&1 &'
-                echo 'Flask app started in background.'
+                script {
+                    sh "sleep 5"
+                    sh "docker logs $CONTAINER_NAME"
+                }
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline completed successfully.'
+            echo 'Flask app container is running. Access it on http://<Jenkins-Server-IP>:5000'
         }
         failure {
             echo 'Pipeline failed.'
