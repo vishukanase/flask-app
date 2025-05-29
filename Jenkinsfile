@@ -5,7 +5,7 @@ pipeline {
         IMAGE_NAME = 'flask-app-image'
         TAG = 'latest'
         CONTAINER_NAME = 'flask-app-container'
-        DOCKER_HUB_REPO = '<your-docker-hub-username>/flask-app-image'
+        DOCKER_HUB_REPO = 'vishvajitkanase/flask-app-image'
     }
 
     stages {
