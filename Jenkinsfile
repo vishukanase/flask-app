@@ -32,22 +32,31 @@ stage('Delete Old Docker Image from Hub') {
     steps {
         script {
             withCredentials([string(credentialsId: 'docker-hub-token', variable: 'DOCKER_HUB_TOKEN')]) {
-                sh "curl -X DELETE -H 'Authorization: Bearer $DOCKER_HUB_TOKEN' https://hub.docker.com/v2/repositories/vishvajitkanase/flask-app-image/tags/latest"
+                sh """
+                curl -X GET -H 'Authorization: Bearer $DOCKER_HUB_TOKEN' \
+                https://hub.docker.com/v2/repositories/vishvajitkanase/flask-app-image/tags | \
+                jq -r '.results[] | select(.name != "latest") | .name' | \
+                xargs -I {} curl -X DELETE -H 'Authorization: Bearer $DOCKER_HUB_TOKEN' \
+                https://hub.docker.com/v2/repositories/vishvajitkanase/flask-app-image/tags/{}
+                """
             }
         }
     }
 }
 
+
 stage('Push to Docker Hub') {
     steps {
         script {
-            withCredentials([string(credentialsId: 'docker-hub-token', variable: 'DOCKER_HUB_TOKEN')]) {
-                sh "docker login -u <your-docker-hub-username> --password-stdin <<< $DOCKER_HUB_TOKEN"
-                sh "docker push <your-docker-hub-username>/flask-app-image:latest"
+            withCredentials([string(credentialsId: 'docker-hub-token', variable: 'DOCKER_HUB_TOKEN'),
+                             string(credentialsId: 'docker-hub-username', variable: 'DOCKER_HUB_USERNAME')]) {
+                sh "echo $DOCKER_HUB_TOKEN | docker login -u $DOCKER_HUB_USERNAME --password-stdin"
+                sh "docker push $DOCKER_HUB_USERNAME/${IMAGE_NAME}:${TAG}"
             }
         }
     }
 }
+
 
 
         stage('Run Docker Container') {
