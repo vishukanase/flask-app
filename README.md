@@ -66,3 +66,4 @@ SDK:
 pip install -r requirements.txt (all the requirement whichi is mentioned in the is present in the requiement.txt files )
 az login (login through azure cli)
 python sdk-script.py
+ 
