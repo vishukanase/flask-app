@@ -24,18 +24,7 @@ pipeline {
             }
         }
 
-        stage('Tag & Push Image to Docker Hub') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
-                        sh "docker tag ${IMAGE_NAME}:${TAG} $DOCKER_HUB_REPO:${TAG}"
-                        sh "echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin"
-                        sh "docker push $DOCKER_HUB_REPO:${TAG}"
-                    }
-                }
-            }
-        }
-
+       
         stage('Run Docker Container') {
             steps {
                 script {
@@ -53,6 +42,22 @@ pipeline {
                 }
             }
         }
+
+ stage('Tag & Push Image to Docker Hub') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                        sh "docker tag ${IMAGE_NAME}:${TAG} $DOCKER_HUB_REPO:${TAG}"
+                        sh "echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin"
+                        sh "docker push $DOCKER_HUB_REPO:${TAG}"
+                    }
+                }
+            }
+        }
+
+
+
+        
     }
 
     post {
