@@ -7,11 +7,7 @@ pipeline {
         string(name: 'CONTAINER_NAME', defaultValue: 'flask-app-container', description: 'Enter Docker container name')
         string(name: 'GIT_CREDENTIAL_ID', defaultValue: 'github-token', description: 'Enter GitHub credential ID')
         string(name: 'GIT_REPO_URL', defaultValue: 'https://github.com/vishukanase/flask-app.git', description: 'Enter GitHub repository URL')
-        string(name: 'GIT_BRANCH', defaultValue: 'main', description: 'Enter Git branch name')
-        string(name: 'GIT_BRANCH', defaultValue: 'main', description: 'Enter Git branch name')
-
-
-        
+        string(name: 'GIT_BRANCH', defaultValue: 'main', description: 'Enter Git branch name')        
     }
 
     stages {
